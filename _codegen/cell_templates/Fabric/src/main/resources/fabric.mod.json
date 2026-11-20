@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "irongolemspawnchecker",
+  "version": "${version}",
+  "name": "Iron Golem Spawn Checker",
+  "description": "Point at a villager and see, in red, why it is not producing iron golems. The server works out the answer; the client shows it. One jar for both. Works in singleplayer and multiplayer, and the server does not need clients to have the mod.",
+  "authors": ["Kishku7"],
+  "contact": {
+    "homepage": "https://github.com/Kishku7/IronGolemSpawnChecker",
+    "sources": "https://github.com/Kishku7/IronGolemSpawnChecker",
+    "issues": "https://github.com/Kishku7/mod_support/issues"
+  },
+  "license": "ARR",
+  "icon": "assets/irongolemspawnchecker/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.kishku7.irongolemspawnchecker.IronGolemSpawnCheckerFabric"],
+    "client": ["com.kishku7.irongolemspawnchecker.client.IronGolemSpawnCheckerFabricClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": [">=${mcLower}", "<${mcUpper}"],
+    "fabric-api": ">=0.145.0"
+  }
+}

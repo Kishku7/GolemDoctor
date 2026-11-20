@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[61,)"
+license="All Rights Reserved"
+issueTrackerURL="https://github.com/Kishku7/mod_support/issues"
+
+[[mods]]
+modId="irongolemspawnchecker"
+version="${file.jarVersion}"
+displayName="Iron Golem Spawn Checker"
+authors="Kishku7"
+description='''Point at a villager and see why it is not producing iron golems. One jar for client and server.'''
+
+[[dependencies.irongolemspawnchecker]]
+    modId="forge"
+    mandatory=true
+    versionRange="[61,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.irongolemspawnchecker]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.21.11,1.21.12)"
+    ordering="NONE"
+    side="BOTH"

@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    // folia-api is a SUPERSET of the Paper API surface, so compiling against it covers Spigot/Paper
+    // AND Folia on one classpath. Gate Folia-only behaviour behind a runtime detect at the call site.
+    compileOnly "dev.folia:folia-api:${folia_api_version}"
+}
+
+version = "${mod_version}+${minecraft_version}-plugin"
+group = 'com.kishku7.irongolemspawnchecker'
+base { archivesName = 'irongolemspawnchecker' }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+// D16 single-source: compile ONLY the cog-generated tree (scripts\cog-gen.ps1). No shared_* srcDirs.
+sourceSets.main.java.srcDirs = ['gen/src/main/java']
+
+processResources {
+    def ep = [name: project.plugin_name, version: project.mod_version, api_version: project.plugin_api_version]
+    inputs.properties(ep)
+    filesMatching('plugin.yml') { expand(ep) }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 25
+    options.compilerArgs << '-Xlint:all'   // D11: zero-warning bar on every cell.
+}

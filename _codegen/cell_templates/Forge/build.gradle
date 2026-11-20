@@ -1,0 +1,49 @@
+plugins {
+    id 'java'                                      // FG7 does NOT auto-apply java -- declare it.
+    id 'eclipse'
+    id 'net.minecraftforge.gradle' version '7.0.31'
+}
+
+version = "${mod_version}+${minecraft_version}-forge"
+group = 'com.kishku7.irongolemspawnchecker'
+
+base {
+    archivesName = 'irongolemspawnchecker'
+}
+
+// 1.21.11 = mojmap (1.20.6+): run on JDK 21, no renamer, plain jar is the production artifact.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// FG7: plugins come from the Gradle Plugin Portal (NO pluginManagement Forge-maven block).
+// The Minecraft Mavenizer runs automatically at configuration time when minecraft.dependency(...)
+// resolves (first run ~5-6 min: decompile+patch+recompile Forge into a local MC maven, cached after).
+// mavenizer FIRST, then forgeMaven + minecraftLibsMaven.
+repositories {
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
+// D16 single-source: compile ONLY the cog-generated tree (scripts\cog-gen.ps1). No shared_* srcDirs.
+sourceSets.main.java.srcDirs = ['gen/src/main/java']
+sourceSets.main.resources.srcDirs = ['src/main/resources', 'gen/src/main/resources']
+
+dependencies {
+    // 1.21.11 (Forge 61) runs a MOJMAP runtime -> no renamer; the plain jar is production. This
+    // template bundles no libraries, so no jarjar/JiJ is needed.
+    implementation minecraft.dependency("net.minecraftforge:forge:${forge_version}")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+    options.compilerArgs += ['-Xlint:all']   // D11: zero-warning bar on every cell, incl. Forge.
+}
+
+// Forge reads the mod version from the jar manifest (mods.toml ${file.jarVersion}).
+jar {
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
+}
