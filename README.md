@@ -1,7 +1,7 @@
-# Iron Golem Spawn Checker
+# Golem Doctor
 
-Your villagers are not making iron golems and you do not know why. Point at one and the answer appears in the
-middle of your screen, in red, in a few words.
+**Why no golem?** Your villagers are not making iron golems and you do not know why. Point at one and the answer
+appears in the middle of your screen, in red, in a few words.
 
 ## What you see
 - **NO BED** - the villager has no bed to sleep in.
