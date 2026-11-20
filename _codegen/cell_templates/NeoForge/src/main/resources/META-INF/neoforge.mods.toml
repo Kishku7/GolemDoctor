@@ -4,19 +4,19 @@ license="GPL-3.0-only"
 issueTrackerURL="https://github.com/Kishku7/mod_support/issues"
 
 [[mods]]
-modId="irongolemspawnchecker"
+modId="golemdoctor"
 version="${mod_version}"
-displayName="Iron Golem Spawn Checker"
+displayName="Golem Doctor"
 authors="Kishku7"
 description='''Point at a villager and see why it is not producing iron golems. One jar for client and server.'''
 
-[[dependencies.irongolemspawnchecker]]
+[[dependencies.golemdoctor]]
     modId="neoforge"
     type="required"
     versionRange="${neoforgeRange}"
     ordering="NONE"
     side="BOTH"
-[[dependencies.irongolemspawnchecker]]
+[[dependencies.golemdoctor]]
     modId="minecraft"
     type="required"
     versionRange="${mcRange}"

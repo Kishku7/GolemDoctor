@@ -1,4 +1,4 @@
-package com.kishku7.irongolemspawnchecker.check;
+package com.kishku7.golemdoctor.check;
 
 /**
  * Why a villager is not producing iron golems. Each label is one to three words, upper case, and is

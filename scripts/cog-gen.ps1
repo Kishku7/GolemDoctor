@@ -90,7 +90,7 @@ if ($loader -ne 'plugin') {
     # D4: 26.3 Fabric/NeoForge => RESOURCE major 97 exact-range (min=max=97). Forge 1.21.11 is in the
     # resource DEAD ZONE (pf 75, 65..81) => ship the exact range on the DATA major 94 instead.
     $pf = if ($loader -eq 'forge') { '94' } else { '97' }
-    ('{"pack":{"description":"Iron Golem Spawn Checker resources","pack_format":' + $pf + ',"min_format":' + $pf + ',"max_format":' + $pf + '}}') |
+    ('{"pack":{"description":"Golem Doctor resources","pack_format":' + $pf + ',"min_format":' + $pf + ',"max_format":' + $pf + '}}') |
         Set-Content (Join-Path $genR 'pack.mcmeta') -Encoding utf8NoBOM
 }
 

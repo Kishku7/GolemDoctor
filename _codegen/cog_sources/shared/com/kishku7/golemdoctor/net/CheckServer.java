@@ -1,8 +1,8 @@
-package com.kishku7.irongolemspawnchecker.net;
+package com.kishku7.golemdoctor.net;
 
-import com.kishku7.irongolemspawnchecker.IronGolemSpawnChecker;
-import com.kishku7.irongolemspawnchecker.check.CheckResult;
-import com.kishku7.irongolemspawnchecker.check.GolemCheck;
+import com.kishku7.golemdoctor.GolemDoctor;
+import com.kishku7.golemdoctor.check.CheckResult;
+import com.kishku7.golemdoctor.check.GolemCheck;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +26,7 @@ public final class CheckServer {
         ServerLevel level = player.level();
         long now = level.getGameTime();
         Long last = LAST_REQUEST_TICK.get(player.getUUID());
-        if (last != null && now - last < IronGolemSpawnChecker.MIN_REQUEST_GAP_TICKS && now >= last) {
+        if (last != null && now - last < GolemDoctor.MIN_REQUEST_GAP_TICKS && now >= last) {
             return null;
         }
         LAST_REQUEST_TICK.put(player.getUUID(), now);
@@ -35,7 +35,7 @@ public final class CheckServer {
         if (!(entity instanceof Villager villager) || !villager.isAlive()) {
             return null;
         }
-        double reach = IronGolemSpawnChecker.MAX_REACH_BLOCKS;
+        double reach = GolemDoctor.MAX_REACH_BLOCKS;
         if (player.distanceToSqr(villager) > reach * reach) {
             return null;
         }

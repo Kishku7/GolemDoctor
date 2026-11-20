@@ -1,6 +1,6 @@
-package com.kishku7.irongolemspawnchecker.net;
+package com.kishku7.golemdoctor.net;
 
-import com.kishku7.irongolemspawnchecker.check.CheckResult;
+import com.kishku7.golemdoctor.check.CheckResult;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

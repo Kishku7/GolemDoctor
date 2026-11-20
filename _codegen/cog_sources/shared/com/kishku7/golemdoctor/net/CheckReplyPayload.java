@@ -1,10 +1,10 @@
-package com.kishku7.irongolemspawnchecker.net;
+package com.kishku7.golemdoctor.net;
 
-import com.kishku7.irongolemspawnchecker.IronGolemSpawnChecker;
-import com.kishku7.irongolemspawnchecker.check.CheckResult;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Entry;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Village;
-import com.kishku7.irongolemspawnchecker.check.Reason;
+import com.kishku7.golemdoctor.GolemDoctor;
+import com.kishku7.golemdoctor.check.CheckResult;
+import com.kishku7.golemdoctor.check.CheckResult.Entry;
+import com.kishku7.golemdoctor.check.CheckResult.Village;
+import com.kishku7.golemdoctor.check.Reason;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -19,7 +19,7 @@ import net.minecraft.resources.Identifier;
 public record CheckReplyPayload(CheckResult result) implements CustomPacketPayload {
 
     public static final Type<CheckReplyPayload> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(IronGolemSpawnChecker.MOD_ID, "check_reply"));
+            new Type<>(Identifier.fromNamespaceAndPath(GolemDoctor.MOD_ID, "check_reply"));
 
     /** Hard cap on reasons read from the wire, so a bad packet cannot allocate a huge list. */
     private static final int MAX_REASONS = 16;

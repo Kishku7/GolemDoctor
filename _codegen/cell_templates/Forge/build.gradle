@@ -5,10 +5,10 @@ plugins {
 }
 
 version = "${mod_version}+${minecraft_version}-forge"
-group = 'com.kishku7.irongolemspawnchecker'
+group = 'com.kishku7.golemdoctor'
 
 base {
-    archivesName = 'irongolemspawnchecker'
+    archivesName = 'golemdoctor'
 }
 
 // 1.21.11 = mojmap (1.20.6+): run on JDK 21, no renamer, plain jar is the production artifact.

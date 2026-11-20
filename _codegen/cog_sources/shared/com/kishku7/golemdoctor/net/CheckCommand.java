@@ -1,9 +1,9 @@
-package com.kishku7.irongolemspawnchecker.net;
+package com.kishku7.golemdoctor.net;
 
-import com.kishku7.irongolemspawnchecker.check.CheckResult;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Entry;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Village;
-import com.kishku7.irongolemspawnchecker.check.GolemCheck;
+import com.kishku7.golemdoctor.check.CheckResult;
+import com.kishku7.golemdoctor.check.CheckResult.Entry;
+import com.kishku7.golemdoctor.check.CheckResult.Village;
+import com.kishku7.golemdoctor.check.GolemCheck;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

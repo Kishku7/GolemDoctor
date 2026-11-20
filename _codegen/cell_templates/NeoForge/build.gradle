@@ -10,8 +10,8 @@ repositories {
 }
 
 version = "${mod_version}+${mc_line}-neoforge"
-group = 'com.kishku7.irongolemspawnchecker'
-base { archivesName = 'irongolemspawnchecker' }
+group = 'com.kishku7.golemdoctor'
+base { archivesName = 'golemdoctor' }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
@@ -26,7 +26,7 @@ neoForge {
         client { client() }
     }
     mods {
-        irongolemspawnchecker { sourceSet(sourceSets.main) }
+        golemdoctor { sourceSet(sourceSets.main) }
     }
 }
 

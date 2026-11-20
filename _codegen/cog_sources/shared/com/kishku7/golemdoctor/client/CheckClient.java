@@ -1,10 +1,10 @@
-package com.kishku7.irongolemspawnchecker.client;
+package com.kishku7.golemdoctor.client;
 
-import com.kishku7.irongolemspawnchecker.IronGolemSpawnChecker;
-import com.kishku7.irongolemspawnchecker.check.CheckResult;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Entry;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Village;
-import com.kishku7.irongolemspawnchecker.net.CheckRequestPayload;
+import com.kishku7.golemdoctor.GolemDoctor;
+import com.kishku7.golemdoctor.check.CheckResult;
+import com.kishku7.golemdoctor.check.CheckResult.Entry;
+import com.kishku7.golemdoctor.check.CheckResult.Village;
+import com.kishku7.golemdoctor.net.CheckRequestPayload;
 import com.mojang.logging.LogUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +63,7 @@ public final class CheckClient {
         }
         if (cooldown-- <= 0) {
             SENDER.accept(new CheckRequestPayload(target.getId()));
-            cooldown = IronGolemSpawnChecker.REFRESH_TICKS;
+            cooldown = GolemDoctor.REFRESH_TICKS;
         }
     }
 
@@ -73,7 +73,7 @@ public final class CheckClient {
         current = result;
         // One line per change, not per refresh, so a long look at one villager does not flood the log.
         if (!result.equals(previous)) {
-            LOGGER.info("[IronGolemSpawnChecker] reply for villager {}: {} | village {}",
+            LOGGER.info("[GolemDoctor] reply for villager {}: {} | village {}",
                     result.entityId(), result.reasons(), result.village());
         }
     }

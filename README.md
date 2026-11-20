@@ -1,9 +1,9 @@
-# Iron Golem Spawn Checker - Build Guide (minecraft-26.3 branch)
+# Golem Doctor - Build Guide (minecraft-26.3 branch)
 
 Landing page: the `main` branch README. Report issues / support: https://github.com/Kishku7/mod_support
 
-Point at a villager and see, in red, why it is not producing iron golems. This branch holds the one source
-for the mod; one jar serves both the client and the server.
+Why no golem? Point at a villager and see, in red, why it is not producing iron golems. This branch holds the
+one source for the mod; one jar serves both the client and the server.
 
 ## What you need installed
 - JDK 25 (Eclipse Temurin; Gradle finds it by major version, no path is pinned)
@@ -14,7 +14,7 @@ for the mod; one jar serves both the client and the server.
 ```
 pwsh scripts/build-fabric.ps1
 ```
-The jar lands in `dist/` as `irongolemspawnchecker-<version>+26.3-fabric.jar`. The build logs to
+The jar lands in `dist/` as `golemdoctor-<version>+26.3-fabric.jar`. The build logs to
 `Fabric/_build.log`; it is only green when that log holds no `.java ... warning` line.
 
 ## Status of the platforms

@@ -1,4 +1,4 @@
-package com.kishku7.irongolemspawnchecker.check;
+package com.kishku7.golemdoctor.check;
 
 import java.util.List;
 

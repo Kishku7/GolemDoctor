@@ -1,7 +1,7 @@
-package com.kishku7.irongolemspawnchecker.check;
+package com.kishku7.golemdoctor.check;
 
-import com.kishku7.irongolemspawnchecker.IronGolemSpawnChecker;
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Entry;
+import com.kishku7.golemdoctor.GolemDoctor;
+import com.kishku7.golemdoctor.check.CheckResult.Entry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public final class GolemCheck {
 
         Optional<Long> lastSlept = brain.getMemory(MemoryModuleType.LAST_SLEPT);
         boolean sleptRecently = lastSlept.isPresent()
-                && now - lastSlept.get() < IronGolemSpawnChecker.SLEEP_WINDOW_TICKS;
+                && now - lastSlept.get() < GolemDoctor.SLEEP_WINDOW_TICKS;
         if (!sleptRecently) {
             if (!brain.hasMemoryValue(MemoryModuleType.HOME)) {
                 reasons.add(new Entry(Reason.NO_BED, 0));
@@ -63,7 +63,7 @@ public final class GolemCheck {
                 ready++;
             }
         }
-        if (ready < IronGolemSpawnChecker.VILLAGERS_NEEDED) {
+        if (ready < GolemDoctor.VILLAGERS_NEEDED) {
             reasons.add(new Entry(Reason.TOO_FEW_READY, ready));
         }
 
@@ -94,7 +94,7 @@ public final class GolemCheck {
                 reachable++;
             }
         }
-        return reachable >= Math.min(IronGolemSpawnChecker.VILLAGERS_NEEDED, nearby.size());
+        return reachable >= Math.min(GolemDoctor.VILLAGERS_NEEDED, nearby.size());
     }
 
     /**

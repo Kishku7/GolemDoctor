@@ -1,12 +1,12 @@
 """compat.py -- the ONE source of truth for per-loader ENTRYPOINTS (D15) and the version axis.
 
-Iron Golem Spawn Checker is ONE merged jar per loader and MC line: the same binary carries the
+Golem Doctor is ONE merged jar per loader and MC line: the same binary carries the
 server logic (cog_sources/shared/check + net) and the client popup (cog_sources/shared/client).
 The client entrypoint is the only place client classes are referenced, so a dedicated server never
 loads them.
 
 STATUS OF THE CELLS
-    Fabric   26.3  IMPLEMENTED and tested  -> IronGolemSpawnCheckerFabric (ModInitializer) + client entrypoint
+    Fabric   26.3  IMPLEMENTED and tested  -> GolemDoctorFabric (ModInitializer) + client entrypoint
     NeoForge 26.3  FUTURE (cell template kept; entrypoint not written yet)
     Forge    1.21.11  FUTURE (cell template kept; entrypoint not written yet)
     Plugin   FUTURE (cell template kept; a Bukkit plugin can answer the same request channel)
@@ -25,7 +25,7 @@ Usage (called by scripts/cog-gen.ps1):
 import os
 import sys
 
-PKG = "com.kishku7.irongolemspawnchecker"
+PKG = "com.kishku7.golemdoctor"
 PKG_PATH = PKG.replace(".", "/")
 
 
@@ -34,15 +34,15 @@ def vt(ver):
     return tuple(int(x) for x in ver.split("-")[0].split("."))
 
 
-_FABRIC_MAIN = '''package com.kishku7.irongolemspawnchecker;
+_FABRIC_MAIN = '''package com.kishku7.golemdoctor;
 
-import com.kishku7.irongolemspawnchecker.net.CheckCommand;
-import com.kishku7.irongolemspawnchecker.net.CheckerNet;
+import com.kishku7.golemdoctor.net.CheckCommand;
+import com.kishku7.golemdoctor.net.CheckerNet;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
-/** Iron Golem Spawn Checker - Fabric common entrypoint (runs on dedicated servers and clients). */
-public class IronGolemSpawnCheckerFabric implements ModInitializer {
+/** Golem Doctor - Fabric common entrypoint (runs on dedicated servers and clients). */
+public class GolemDoctorFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
@@ -54,11 +54,11 @@ public class IronGolemSpawnCheckerFabric implements ModInitializer {
 }
 '''
 
-_FABRIC_CLIENT = '''package com.kishku7.irongolemspawnchecker.client;
+_FABRIC_CLIENT = '''package com.kishku7.golemdoctor.client;
 
-import com.kishku7.irongolemspawnchecker.IronGolemSpawnChecker;
-import com.kishku7.irongolemspawnchecker.net.CheckReplyPayload;
-import com.kishku7.irongolemspawnchecker.net.CheckRequestPayload;
+import com.kishku7.golemdoctor.GolemDoctor;
+import com.kishku7.golemdoctor.net.CheckReplyPayload;
+import com.kishku7.golemdoctor.net.CheckRequestPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -67,8 +67,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.resources.Identifier;
 
-/** Iron Golem Spawn Checker - Fabric client entrypoint: request while pointing, show the reply. */
-public final class IronGolemSpawnCheckerFabricClient implements ClientModInitializer {
+/** Golem Doctor - Fabric client entrypoint: request while pointing, show the reply. */
+public final class GolemDoctorFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
@@ -82,7 +82,7 @@ public final class IronGolemSpawnCheckerFabricClient implements ClientModInitial
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> CheckClient.reset());
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.HOTBAR,
-                Identifier.fromNamespaceAndPath(IronGolemSpawnChecker.MOD_ID, "popup"),
+                Identifier.fromNamespaceAndPath(GolemDoctor.MOD_ID, "popup"),
                 (graphics, tickDelta) -> CheckClient.render(graphics));
     }
 }
@@ -90,8 +90,8 @@ public final class IronGolemSpawnCheckerFabricClient implements ClientModInitial
 
 _FILES = {
     "fabric": {
-        PKG_PATH + "/IronGolemSpawnCheckerFabric.java": _FABRIC_MAIN,
-        PKG_PATH + "/client/IronGolemSpawnCheckerFabricClient.java": _FABRIC_CLIENT,
+        PKG_PATH + "/GolemDoctorFabric.java": _FABRIC_MAIN,
+        PKG_PATH + "/client/GolemDoctorFabricClient.java": _FABRIC_CLIENT,
     },
 }
 

@@ -1,6 +1,6 @@
-package com.kishku7.irongolemspawnchecker.check;
+package com.kishku7.golemdoctor.check;
 
-import com.kishku7.irongolemspawnchecker.check.CheckResult.Village;
+import com.kishku7.golemdoctor.check.CheckResult.Village;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;

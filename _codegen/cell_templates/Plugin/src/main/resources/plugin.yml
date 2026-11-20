@@ -1,11 +1,11 @@
 name: ${name}
 version: ${version}
-main: com.kishku7.irongolemspawnchecker.plugin.IronGolemSpawnCheckerPlugin
+main: com.kishku7.golemdoctor.plugin.GolemDoctorPlugin
 api-version: ${api_version}
 folia-supported: true
-description: Iron Golem Spawn Checker plugin (future cell; not built yet).
+description: Golem Doctor plugin (future cell; not built yet).
 website: https://github.com/Kishku7/mod_support/issues
 commands:
-  irongolemspawnchecker:
+  golemdoctor:
     description: Explain why a villager is not spawning an iron golem.
-    usage: /irongolemspawnchecker
+    usage: /golemdoctor

@@ -1,6 +1,6 @@
-package com.kishku7.irongolemspawnchecker.net;
+package com.kishku7.golemdoctor.net;
 
-import com.kishku7.irongolemspawnchecker.IronGolemSpawnChecker;
+import com.kishku7.golemdoctor.GolemDoctor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
 public record CheckRequestPayload(int entityId) implements CustomPacketPayload {
 
     public static final Type<CheckRequestPayload> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(IronGolemSpawnChecker.MOD_ID, "check_request"));
+            new Type<>(Identifier.fromNamespaceAndPath(GolemDoctor.MOD_ID, "check_request"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CheckRequestPayload> CODEC =
             StreamCodec.composite(ByteBufCodecs.VAR_INT, CheckRequestPayload::entityId, CheckRequestPayload::new);

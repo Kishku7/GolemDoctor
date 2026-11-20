@@ -1,10 +1,10 @@
-package com.kishku7.irongolemspawnchecker;
+package com.kishku7.golemdoctor;
 
 /** Shared mod constants (loader-agnostic, no net.minecraft imports). */
-public final class IronGolemSpawnChecker {
-    private IronGolemSpawnChecker() {}
+public final class GolemDoctor {
+    private GolemDoctor() {}
 
-    public static final String MOD_ID = "irongolemspawnchecker";
+    public static final String MOD_ID = "golemdoctor";
 
     /** Villagers (that qualify) a villager needs within range before vanilla will spawn a golem. */
     public static final int VILLAGERS_NEEDED = 5;

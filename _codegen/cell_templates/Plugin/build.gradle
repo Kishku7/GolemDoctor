@@ -14,8 +14,8 @@ dependencies {
 }
 
 version = "${mod_version}+${minecraft_version}-plugin"
-group = 'com.kishku7.irongolemspawnchecker'
-base { archivesName = 'irongolemspawnchecker' }
+group = 'com.kishku7.golemdoctor'
+base { archivesName = 'golemdoctor' }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 

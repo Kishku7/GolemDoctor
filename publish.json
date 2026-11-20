@@ -1,7 +1,7 @@
 {
   "modrinth_id": "REPLACE_ME",
-  "slug": "REPLACE_ME",
-  "jar_prefix": "irongolemspawnchecker",
+  "slug": "golem-doctor",
+  "jar_prefix": "golemdoctor",
   "fabric_api_dep": "P7dR8mSH",
   "env": "server_only_client_optional",
   "quilt_via_fabric_pre26": true,
