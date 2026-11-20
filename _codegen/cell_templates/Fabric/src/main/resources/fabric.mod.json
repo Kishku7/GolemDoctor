@@ -10,7 +10,7 @@
     "sources": "https://github.com/Kishku7/IronGolemSpawnChecker",
     "issues": "https://github.com/Kishku7/mod_support/issues"
   },
-  "license": "ARR",
+  "license": "GPL-3.0-only",
   "icon": "assets/irongolemspawnchecker/icon.png",
   "environment": "*",
   "entrypoints": {

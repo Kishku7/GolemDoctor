@@ -44,3 +44,11 @@ villagers that can walk to each other, room to place the golem) and sends the li
 plus the villager's number in its village. The client draws that as a popup while the crosshair stays on the
 villager. The server only ever replies to a request, so a client without the mod is never sent anything, and a
 client with the mod sends nothing to a server that does not have it.
+
+## License and credit
+Copyright (c) 2026 Kishku7. Released under the GNU General Public License v3.0 only (see `LICENSE`).
+
+Inspired by Iron Golem Spawn Checker by MossShade (https://modrinth.com/mod/iron-golem-spawn-checker), a client-side
+overlay that shows where iron golems can spawn. This mod is a separate work, written from the vanilla game code
+for a different job (telling you why a villager is not producing golems); none of that mod's code is used here.
+Thank you to its author for the idea.

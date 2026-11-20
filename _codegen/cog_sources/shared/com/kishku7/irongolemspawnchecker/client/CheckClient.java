@@ -5,8 +5,10 @@ import com.kishku7.irongolemspawnchecker.check.CheckResult;
 import com.kishku7.irongolemspawnchecker.check.CheckResult.Entry;
 import com.kishku7.irongolemspawnchecker.check.CheckResult.Village;
 import com.kishku7.irongolemspawnchecker.net.CheckRequestPayload;
+import com.mojang.logging.LogUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
@@ -31,6 +33,8 @@ public final class CheckClient {
     public static volatile Consumer<CustomPacketPayload> SENDER = p -> { };
     /** Set by the loader: true only when the connected server advertises our request channel. */
     public static volatile BooleanSupplier CAN_SEND = () -> false;
+
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final int RED = 0xFFFF5555;
     private static final int GREEN = 0xFF55FF55;
@@ -65,7 +69,13 @@ public final class CheckClient {
 
     /** Called on the client thread with a server reply. */
     public static void onReply(CheckResult result) {
+        CheckResult previous = current;
         current = result;
+        // One line per change, not per refresh, so a long look at one villager does not flood the log.
+        if (!result.equals(previous)) {
+            LOGGER.info("[IronGolemSpawnChecker] reply for villager {}: {} | village {}",
+                    result.entityId(), result.reasons(), result.village());
+        }
     }
 
     /** Call when the player leaves a world so a stale answer cannot show in the next one. */

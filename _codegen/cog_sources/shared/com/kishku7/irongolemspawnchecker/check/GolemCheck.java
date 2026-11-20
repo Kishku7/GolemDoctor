@@ -106,10 +106,12 @@ public final class GolemCheck {
         BlockPos start = villager.blockPosition();
         SpawnUtil.Strategy strategy = SpawnUtil.Strategy.LEGACY_IRON_GOLEM;
         int tried = 0;
+        boolean skippedUnloaded = false;
         for (int dx = -SPAWN_RANGE_XZ; dx <= SPAWN_RANGE_XZ; dx++) {
             for (int dz = -SPAWN_RANGE_XZ; dz <= SPAWN_RANGE_XZ; dz++) {
                 BlockPos.MutableBlockPos search = start.offset(dx, SPAWN_RANGE_Y, dz).mutable();
                 if (!level.isLoaded(search)) {
+                    skippedUnloaded = true;
                     continue;
                 }
                 if (!moveToSpawnPosition(level, search, strategy)) {
@@ -131,7 +133,8 @@ public final class GolemCheck {
                 }
             }
         }
-        return false;
+        // Columns in unloaded chunks could not be looked at, so "no room" is not proven: stay quiet.
+        return skippedUnloaded;
     }
 
     /** Vanilla SpawnUtil.moveToPossibleSpawnPosition: walk down looking for solid ground. */

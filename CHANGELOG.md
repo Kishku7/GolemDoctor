@@ -14,3 +14,6 @@ First release. One jar per loader and Minecraft line for both client and server.
   it, and a client with the mod does nothing on a server without it.
 - `/golemcheck <villager>` prints the same answer as chat lines.
 - Fabric 26.3 is built and tested. NeoForge 26.3, Forge 1.21.11 and a Paper plugin are planned.
+
+Licensed GPL-3.0-only. Credit: the idea of a spawn checker for iron golems was inspired by MossShade's Iron Golem
+Spawn Checker. No code from that mod is used.
