@@ -13,7 +13,12 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+//[[[cog
+// import sys; sys.path.insert(0, codegen); import compat
+// compat.gfx_import(cog, ver)
+//]]]
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//[[[end]]]
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.villager.Villager;
@@ -113,7 +118,11 @@ public final class CheckClient {
     }
 
     /** HUD element: draws the panel when there is a fresh answer for the villager under the crosshair. */
+    //[[[cog
+    // compat.gfx_render_signature(cog, ver)
+    //]]]
     public static void render(GuiGraphicsExtractor graphics) {
+    //[[[end]]]
         Minecraft mc = Minecraft.getInstance();
         CheckResult result = current;
         if (result == null || heldId == -1 || result.entityId() != heldId) {
@@ -135,10 +144,18 @@ public final class CheckClient {
         int y = graphics.guiHeight() / 2 + 16;
 
         graphics.fill(x, y, x + boxW, y + boxH, PANEL);
+        //[[[cog
+        // compat.gfx_outline(cog, ver)
+        //]]]
         graphics.outline(x, y, boxW, boxH, BORDER);
+        //[[[end]]]
         int ty = y + padding;
         for (Line l : lines) {
+            //[[[cog
+            // compat.gfx_text(cog, ver)
+            //]]]
             graphics.text(font, l.text, x + (boxW - font.width(l.text)) / 2, ty, l.color);
+            //[[[end]]]
             ty += lineHeight;
         }
     }

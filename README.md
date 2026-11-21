@@ -25,8 +25,10 @@ The jar lands in `dist/` as `golemdoctor-<version>+26.3-fabric.jar`. The build l
 | Forge | 1.21.11 | planned (cell template kept) |
 | Paper plugin | - | planned (cell template kept) |
 
-Older Minecraft lines are planned too. Where they differ, the difference is isolated in `_codegen/compat.py`
-with Cog markers in `shared`, never a second copy of a file.
+Older and newer Minecraft lines (1.21.11 to 26.4) are planned. Where they differ, the difference is isolated in
+`_codegen/compat.py` with Cog markers in `shared`, never a second copy of a file. Already seamed: the entity type
+class (`EntityType` before 26.2, `EntityTypes` from 26.2) and the GUI draw class (`GuiGraphics` on 1.21.11,
+`GuiGraphicsExtractor` from 26.1).
 
 ## Repository layout
 - `_codegen/cog_sources/common` - Minecraft-free Java (constants, reasons, result records).
@@ -39,8 +41,8 @@ with Cog markers in `shared`, never a second copy of a file.
 
 ## How it works
 The client sends the entity id of the villager under the crosshair. The server checks the same conditions vanilla
-checks before it spawns a golem (a recent sleep, no golem nearby, five villagers that qualify within ten blocks,
-villagers that can walk to each other, room to place the golem) and sends the list of what is blocking it,
+checks before it spawns a golem (a recent sleep, no golem seen recently, three villagers that qualify within ten blocks
+for the scare method or five for gossip, villagers that can walk to each other, room to place the golem) and sends the list of what is blocking it,
 plus the villager's number in its village. The client draws that as a popup while the crosshair stays on the
 villager. The server only ever replies to a request, so a client without the mod is never sent anything, and a
 client with the mod sends nothing to a server that does not have it.

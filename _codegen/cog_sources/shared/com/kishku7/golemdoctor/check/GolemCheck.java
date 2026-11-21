@@ -11,7 +11,12 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.SpawnUtil;
 import net.minecraft.world.entity.EntitySpawnReason;
+//[[[cog
+// import sys; sys.path.insert(0, codegen); import compat
+// compat.entity_types_import(cog, ver)
+//]]]
 import net.minecraft.world.entity.EntityTypes;
+//[[[end]]]
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.golem.IronGolem;
@@ -147,7 +152,11 @@ public final class GolemCheck {
                 if (++tried > MAX_CANDIDATES) {
                     return false;
                 }
+                //[[[cog
+                // compat.entity_types_create(cog, ver)
+                //]]]
                 IronGolem golem = EntityTypes.IRON_GOLEM.create(level, null, search.immutable(),
+                //[[[end]]]
                         EntitySpawnReason.MOB_SUMMONED, false, false);
                 if (golem == null) {
                     continue;

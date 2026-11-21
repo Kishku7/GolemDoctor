@@ -34,6 +34,52 @@ def vt(ver):
     return tuple(int(x) for x in ver.split("-")[0].split("."))
 
 
+# ---------------------------------------------------------------------------------------------
+# VERSION DRIFT HELPERS (called from Cog blocks in cog_sources/shared; ver = the cell MC version).
+# Surveyed against the decompiled sources 1.21.11, 26.1, 26.1.1, 26.1.2, 26.2, 26.3, 26.4-snapshot-8/10.
+# The vanilla golem rules the check re-reads (spawnGolemIfNeeded 5 / panic 3, wantsToSpawnGolem,
+# LAST_SLEPT window 24000, GOLEM_DETECTED_RECENTLY 599, placement 10 tries +-8 xz +-6 y, spawn obstruction)
+# are the SAME in every one of those versions: only the names below move.
+#   EntityType (class holding IRON_GOLEM)  1.21.11, 26.1.x  -> EntityType ;  26.2+ -> EntityTypes
+#   GUI draw class                         1.21.11 -> GuiGraphics (drawString, renderOutline)
+#                                          26.1+   -> GuiGraphicsExtractor (text, outline)
+# ---------------------------------------------------------------------------------------------
+
+def entity_types(ver):
+    """Class that holds the IRON_GOLEM constant."""
+    return "EntityTypes" if vt(ver) >= (26, 2) else "EntityType"
+
+
+def gfx_class(ver):
+    return "GuiGraphicsExtractor" if vt(ver) >= (26, 1) else "GuiGraphics"
+
+
+def entity_types_import(cog, ver):
+    cog.outl("import net.minecraft.world.entity.{0};".format(entity_types(ver)))
+
+
+def entity_types_create(cog, ver):
+    cog.outl("IronGolem golem = {0}.IRON_GOLEM.create(level, null, search.immutable(),".format(entity_types(ver)))
+
+
+def gfx_import(cog, ver):
+    cog.outl("import net.minecraft.client.gui.{0};".format(gfx_class(ver)))
+
+
+def gfx_render_signature(cog, ver):
+    cog.outl("public static void render({0} graphics) {{".format(gfx_class(ver)))
+
+
+def gfx_outline(cog, ver):
+    name = "outline" if vt(ver) >= (26, 1) else "renderOutline"
+    cog.outl("graphics.{0}(x, y, boxW, boxH, BORDER);".format(name))
+
+
+def gfx_text(cog, ver):
+    name = "text" if vt(ver) >= (26, 1) else "drawString"
+    cog.outl("graphics.{0}(font, l.text, x + (boxW - font.width(l.text)) / 2, ty, l.color);".format(name))
+
+
 _FABRIC_MAIN = '''package com.kishku7.golemdoctor;
 
 import com.kishku7.golemdoctor.net.CheckCommand;
