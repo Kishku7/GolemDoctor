@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.0] - 2026-11-21
+- Fabric builds for Minecraft 1.21.11, 26.1 (26.1 to 26.1.2), 26.2, 26.3 and 26.4 (built against 26.4-snapshot-10).
+- Each build declares the Minecraft range and the Fabric API floor it was built and tested with.
+- No change in behaviour or wording.
+
 ## [1.2.1] - 2026-11-21
 - The jar manifest now carries the mod version (Implementation-Version).
 - The Fabric API floor in the manifest is the version the mod was tested with (0.166.2), not an untested lower one.

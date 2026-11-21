@@ -41,6 +41,8 @@ def vt(ver):
 # LAST_SLEPT window 24000, GOLEM_DETECTED_RECENTLY 599, placement 10 tries +-8 xz +-6 y, spawn obstruction)
 # are the SAME in every one of those versions: only the names below move.
 #   EntityType (class holding IRON_GOLEM)  1.21.11, 26.1.x  -> EntityType ;  26.2+ -> EntityTypes
+#   Fabric API payload registry            1.21.11 -> playC2S/playS2C ; 26.1+ -> serverboundPlay/clientboundPlay
+#   Fabric API HudElement callback         up to 26.3 -> (graphics, tickDelta) ; 26.4+ -> (graphics)
 #   GUI draw class                         1.21.11 -> GuiGraphics (drawString, renderOutline)
 #                                          26.1+   -> GuiGraphicsExtractor (text, outline)
 # ---------------------------------------------------------------------------------------------
@@ -78,6 +80,20 @@ def gfx_outline(cog, ver):
 def gfx_text(cog, ver):
     name = "text" if vt(ver) >= (26, 1) else "drawString"
     cog.outl("graphics.{0}(font, l.text, x + (boxW - font.width(l.text)) / 2, ty, l.color);".format(name))
+
+
+def payload_registry(cog, ver):
+    # Fabric API networking: playC2S()/playS2C() on 1.21.11, serverboundPlay()/clientboundPlay() from 26.1.
+    c2s, s2c = ("playC2S", "playS2C") if vt(ver) < (26, 1) else ("serverboundPlay", "clientboundPlay")
+    cog.outl("PayloadTypeRegistry.{0}().register(CheckRequestPayload.TYPE, CheckRequestPayload.CODEC);".format(c2s))
+    cog.outl("PayloadTypeRegistry.{0}().register(CheckReplyPayload.TYPE, CheckReplyPayload.CODEC);".format(s2c))
+
+
+def hud_lambda(ver):
+    # Fabric API HudElement: render(graphics, deltaTracker) up to the 26.3 line; one argument from the 26.4 line.
+    if vt(ver) >= (26, 4):
+        return "graphics -> CheckClient.render(graphics));"
+    return "(graphics, tickDelta) -> CheckClient.render(graphics));"
 
 
 _FABRIC_MAIN = '''package com.kishku7.golemdoctor;
@@ -129,7 +145,7 @@ public final class GolemDoctorFabricClient implements ClientModInitializer {
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.HOTBAR,
                 Identifier.fromNamespaceAndPath(GolemDoctor.MOD_ID, "popup"),
-                (graphics, tickDelta) -> CheckClient.render(graphics));
+                __HUD_LAMBDA__
     }
 }
 '''
@@ -159,6 +175,8 @@ def emit(loader, gen_java_dir, ver=None):
     for rel, text in entrypoint_files(loader).items():
         dest = os.path.join(gen_java_dir, rel.replace("/", os.sep))
         os.makedirs(os.path.dirname(dest), exist_ok=True)
+        if ver:
+            text = text.replace("__HUD_LAMBDA__", hud_lambda(ver))
         with open(dest, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
         print("emit entrypoint: " + rel)

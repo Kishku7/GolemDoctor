@@ -1,12 +1,14 @@
-# build-fabric.ps1 -- cog-gen the Fabric cell, then gradlew clean build on JDK 25.
+# build-fabric.ps1 [-Line 1.21.11|26.1|26.2|26.3|26.4] -- cog-gen the Fabric cell for one matrix line, then gradlew clean build.
+param([string]$Line = '26.3')
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $dist = Join-Path $repoRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
-$jdk25 = ((Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter 'jdk-25.*' | Sort-Object { [version]($_.Name -replace '^jdk-|-hotspot$','') } -Descending | Select-Object -First 1).FullName)
+$mx = (Get-Content (Join-Path $repoRoot '_codegen\matrix.json') -Raw | ConvertFrom-Json).fabric.$Line
+$jdk25 = ((Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter "jdk-$($mx.jdk).*" | Sort-Object { [version]($_.Name -replace '^jdk-|-hotspot$','') } -Descending | Select-Object -First 1).FullName)
 $cell = Join-Path $repoRoot 'Fabric'
 
-& pwsh -NoProfile -File (Join-Path $PSScriptRoot 'cog-gen.ps1') -Cell 'Fabric'
+& pwsh -NoProfile -File (Join-Path $PSScriptRoot 'cog-gen.ps1') -Cell 'Fabric' -Line $Line
 if ($LASTEXITCODE -ne 0) { throw 'Fabric cog-gen failed' }
 
 $env:JAVA_HOME = $jdk25

@@ -15,8 +15,13 @@ public final class CheckerNet {
 
     /** Register payload types. Runs on both client and dedicated server. */
     public static void registerTypes() {
+        //[[[cog
+        // import sys; sys.path.insert(0, codegen); import compat
+        // compat.payload_registry(cog, ver)
+        //]]]
         PayloadTypeRegistry.serverboundPlay().register(CheckRequestPayload.TYPE, CheckRequestPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(CheckReplyPayload.TYPE, CheckReplyPayload.CODEC);
+        //[[[end]]]
     }
 
     /** Register the server-side request handler and the disconnect cleanup. */

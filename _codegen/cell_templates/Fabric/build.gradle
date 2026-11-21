@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT'
+    id '__PLUGIN__' version '1.16-SNAPSHOT'
 }
 
 version = "${project.mod_version}+${project.mc_line}-fabric"
@@ -15,28 +15,28 @@ sourceSets.main.resources.srcDirs = ['src/main/resources', 'gen/src/main/resourc
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    compileOnly localRuntime("net.fabricmc:fabric-loader:${project.loader_version}")
+__MAPPINGS__    compileOnly localRuntime("net.fabricmc:fabric-loader:${project.loader_version}")
     compileOnly localRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
 }
 
 processResources {
-    inputs.properties(["version": project.version, "mcLower": project.mc_lower, "mcUpper": project.mc_upper])
+    inputs.properties(["version": project.version, "mcLower": project.mc_lower, "mcUpper": project.mc_upper, "apiMin": project.fabric_api_min])
     filesMatching("fabric.mod.json") {
-        expand "version": project.version, "mcLower": project.mc_lower, "mcUpper": project.mc_upper
+        expand "version": project.version, "mcLower": project.mc_lower, "mcUpper": project.mc_upper, "apiMin": project.fabric_api_min
     }
     // pack.mcmeta is emitted CONCRETE (D4 range form, major 88) by cog-gen into gen/ -- not templated here.
 }
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-    it.options.release = 25
+    it.options.release = __JDK__
     it.options.compilerArgs << '-Xlint:all'   // D11: zero-warning bar on every cell.
 }
 
 java {
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION___JDK__
+    targetCompatibility = JavaVersion.VERSION___JDK__
 }
 
 // D23: the jar manifest carries the real version, so the published file can be checked without trusting its name.
