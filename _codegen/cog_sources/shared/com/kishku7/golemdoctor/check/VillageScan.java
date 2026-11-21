@@ -5,9 +5,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.PoiTypeTags;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiRecord;
 import net.minecraft.world.entity.npc.villager.Villager;
@@ -28,6 +31,8 @@ public final class VillageScan {
     static final int SCAN_RADIUS = 96;
     static final int LINK_BLOCKS = 24;
     static final int MARGIN_BLOCKS = 16;
+    /** How far from the bell villagers that share it are looked for. */
+    static final int BELL_RADIUS = 128;
 
     public static Village scan(ServerLevel level, Villager villager) {
         BlockPos origin = villager.blockPosition();
@@ -68,7 +73,19 @@ public final class VillageScan {
 
         AABB box = new AABB(minX - MARGIN_BLOCKS, level.getMinY(), minZ - MARGIN_BLOCKS,
                 maxX + MARGIN_BLOCKS + 1, level.getMaxY(), maxZ + MARGIN_BLOCKS + 1);
-        List<Villager> members = new ArrayList<>(level.getEntitiesOfClass(Villager.class, box));
+        List<Villager> members = new ArrayList<>(level.getEntitiesOfClass(Villager.class, box, Villager::isAlive));
+        // Villagers remember the bell they gather at (MEETING_POINT). Sharing one is the closest thing the
+        // game has to "these villagers belong together", so it wins over the position-based guess.
+        Optional<GlobalPos> bell = villager.getBrain().getMemory(MemoryModuleType.MEETING_POINT);
+        if (bell.isPresent()) {
+            BlockPos bp = bell.get().pos();
+            AABB wide = new AABB(bp).inflate(BELL_RADIUS, level.getHeight(), BELL_RADIUS);
+            List<Villager> byBell = level.getEntitiesOfClass(Villager.class, wide, v -> v.isAlive() &&
+                    bell.equals(v.getBrain().getMemory(MemoryModuleType.MEETING_POINT)));
+            if (!byBell.isEmpty()) {
+                members = new ArrayList<>(byBell);
+            }
+        }
         members.sort(Comparator.comparing(v -> v.getUUID()));
         int rank = 0;
         for (int i = 0; i < members.size(); i++) {

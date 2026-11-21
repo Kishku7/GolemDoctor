@@ -15,6 +15,7 @@ import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
@@ -56,18 +57,23 @@ public final class GolemCheck {
         }
 
         AABB box = villager.getBoundingBox().inflate(AGREE_RANGE);
-        List<Villager> nearby = level.getEntitiesOfClass(Villager.class, box);
+        // Only living villagers: a villager that just died lingers in the world for a moment and must not count.
+        List<Villager> nearby = level.getEntitiesOfClass(Villager.class, box, Villager::isAlive);
         int ready = 0;
         for (Villager v : nearby) {
             if (v.wantsToSpawnGolem(now)) {
                 ready++;
             }
         }
-        if (ready < GolemDoctor.VILLAGERS_NEEDED) {
-            reasons.add(new Entry(Reason.TOO_FEW_READY, ready));
+        // Vanilla: gossip (two villagers meeting) asks for 5, the panic trigger (every 100 ticks while a
+        // villager is scared by a hostile mob or hurt) asks for only 3.
+        boolean panicking = brain.isActive(Activity.PANIC);
+        int needed = panicking ? GolemDoctor.PANIC_VILLAGERS_NEEDED : GolemDoctor.VILLAGERS_NEEDED;
+        if (ready < needed) {
+            reasons.add(new Entry(Reason.TOO_FEW_READY, needed));
         }
 
-        if (nearby.size() >= 2 && !canGather(villager, nearby)) {
+        if (!panicking && nearby.size() >= 2 && !canGather(villager, nearby)) {
             reasons.add(new Entry(Reason.CANNOT_MEET, 0));
         }
 
@@ -75,7 +81,8 @@ public final class GolemCheck {
             reasons.add(new Entry(Reason.NO_SPAWN_SPACE, 0));
         }
 
-        return new CheckResult(villager.getId(), reasons, VillageScan.scan(level, villager));
+        return new CheckResult(villager.getId(), reasons, VillageScan.scan(level, villager),
+                nearby.size(), ready, needed, panicking);
     }
 
     /**

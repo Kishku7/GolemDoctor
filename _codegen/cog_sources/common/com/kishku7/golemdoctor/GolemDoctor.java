@@ -9,6 +9,9 @@ public final class GolemDoctor {
     /** Villagers (that qualify) a villager needs within range before vanilla will spawn a golem. */
     public static final int VILLAGERS_NEEDED = 5;
 
+    /** Villagers that must agree when the trigger is panic (a hostile mob in sight or being hurt): vanilla passes 3. */
+    public static final int PANIC_VILLAGERS_NEEDED = 3;
+
     /** Ticks since a villager last slept within which it still counts for a golem (vanilla: 24000). */
     public static final long SLEEP_WINDOW_TICKS = 24000L;
 

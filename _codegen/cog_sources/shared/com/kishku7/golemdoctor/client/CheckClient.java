@@ -43,28 +43,49 @@ public final class CheckClient {
     private static final int PANEL = 0xC0101010;
     private static final int BORDER = 0xFF505050;
 
+    /** How long the popup stays after the crosshair leaves the villager (5 seconds), so a running villager can be read. */
+    private static final int HOLD_TICKS = 100;
+
     private static volatile CheckResult current;
-    private static int lastTargetId = -1;
+    private static volatile int heldId = -1;
+    private static volatile long holdUntil;
+    private static long clientTicks;
     private static int cooldown;
 
     /** Called every client tick. */
     public static void tick(Minecraft mc) {
-        Villager target = targetVillager(mc);
-        if (target == null || !CAN_SEND.getAsBoolean()) {
-            current = null;
-            lastTargetId = -1;
-            cooldown = 0;
+        clientTicks++;
+        if (mc.player == null || mc.level == null || !CAN_SEND.getAsBoolean()) {
+            reset();
             return;
         }
-        if (target.getId() != lastTargetId) {
-            current = null;
-            lastTargetId = target.getId();
-            cooldown = 0;
+        Villager target = targetVillager(mc);
+        if (target != null) {
+            if (target.getId() != heldId) {
+                current = null;
+                cooldown = 0;
+            }
+            heldId = target.getId();
+            holdUntil = clientTicks + HOLD_TICKS;
+        } else if (heldId != -1) {
+            Entity held = mc.level.getEntity(heldId);
+            if (clientTicks > holdUntil || !(held instanceof Villager v) || !v.isAlive()) {
+                clearHeld();
+                return;
+            }
+        } else {
+            return;
         }
         if (cooldown-- <= 0) {
-            SENDER.accept(new CheckRequestPayload(target.getId()));
+            SENDER.accept(new CheckRequestPayload(heldId));
             cooldown = GolemDoctor.REFRESH_TICKS;
         }
+    }
+
+    private static void clearHeld() {
+        current = null;
+        heldId = -1;
+        cooldown = 0;
     }
 
     /** Called on the client thread with a server reply. */
@@ -80,9 +101,7 @@ public final class CheckClient {
 
     /** Call when the player leaves a world so a stale answer cannot show in the next one. */
     public static void reset() {
-        current = null;
-        lastTargetId = -1;
-        cooldown = 0;
+        clearHeld();
     }
 
     private static Villager targetVillager(Minecraft mc) {
@@ -97,8 +116,7 @@ public final class CheckClient {
     public static void render(GuiGraphicsExtractor graphics) {
         Minecraft mc = Minecraft.getInstance();
         CheckResult result = current;
-        Villager target = targetVillager(mc);
-        if (result == null || target == null || target.getId() != result.entityId()) {
+        if (result == null || heldId == -1 || result.entityId() != heldId) {
             return;
         }
 
@@ -130,23 +148,44 @@ public final class CheckClient {
     static List<Line> buildLines(CheckResult result) {
         List<Line> lines = new ArrayList<>();
         Village v = result.village();
-        if (v.known() && v.rank() > 0) {
-            lines.add(new Line("Villager " + v.rank() + " of " + v.total(), WHITE));
-        } else {
-            lines.add(new Line("Villager", WHITE));
-        }
 
-        if (result.reasons().isEmpty()) {
-            lines.add(new Line("SHOULD SPAWN", GREEN));
-        } else {
-            for (Entry e : result.reasons()) {
+        // Individual: only what is wrong with this one villager.
+        lines.add(new Line(v.known() && v.rank() > 0
+                ? "VILLAGER  " + v.rank() + " of " + v.total() : "VILLAGER", WHITE));
+        boolean individualOk = true;
+        for (Entry e : result.reasons()) {
+            if (!e.reason().isGroup()) {
                 lines.add(new Line(e.text(), RED));
+                individualOk = false;
             }
         }
+        if (individualOk) {
+            lines.add(new Line("OK", GREEN));
+        }
 
+        // Group: the villagers around it and the spot a golem would appear.
+        lines.add(new Line("GROUP", WHITE));
+        lines.add(new Line(result.nearby() + " in range, " + result.ready() + " ready", GRAY));
+        lines.add(new Line(result.panicking()
+                ? "Panicking: " + GolemDoctor.PANIC_VILLAGERS_NEEDED + " must be ready"
+                : "Gossip: " + GolemDoctor.VILLAGERS_NEEDED + " ready (panic: "
+                        + GolemDoctor.PANIC_VILLAGERS_NEEDED + ")", GRAY));
+        boolean groupOk = true;
+        for (Entry e : result.reasons()) {
+            if (e.reason().isGroup()) {
+                lines.add(new Line(e.text(), RED));
+                groupOk = false;
+            }
+        }
+        if (groupOk) {
+            lines.add(new Line("OK", GREEN));
+        }
         if (v.known()) {
             lines.add(new Line("Village " + v.chunksX() + "x" + v.chunksZ() + " chunks", GRAY));
             lines.add(new Line("x " + v.minX() + " to " + v.maxX() + "   z " + v.minZ() + " to " + v.maxZ(), GRAY));
+        }
+        if (result.reasons().isEmpty()) {
+            lines.add(new Line("SHOULD SPAWN", GREEN));
         }
         return lines;
     }

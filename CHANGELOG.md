@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0] - 2026-11-20
+- The popup now has two sections: VILLAGER (what is wrong with this one villager: NO BED, NOT SLEPT, GOLEM NEARBY,
+  CANNOT MEET) and GROUP (villagers in range and how many are ready, NEED n READY, NO SPAWN SPACE, village size and
+  coordinates).
+- Panic is understood. Vanilla asks for 5 ready villagers when villagers gossip, but only 3 when a villager is
+  panicking (a hostile mob in sight, or hurt). The popup shows the number that applies right now, and mentions the
+  other one. CANNOT MEET is not reported for a panicking villager, since panic does not need villagers to meet.
+- The popup stays for 5 seconds after the crosshair leaves the villager, and keeps refreshing, so a villager that is
+  running away can still be read.
+- A village is now counted by the bell its villagers gather at when they have one (villagers that share a bell belong
+  together), falling back to the old grouping by nearby beds, job sites and bells.
+- `/golemcheck` prints the group line and marks each blocker as villager or group.
+
 ## [1.0.0] - 2026-11-20
 First release. One jar per loader and Minecraft line for both client and server.
 
