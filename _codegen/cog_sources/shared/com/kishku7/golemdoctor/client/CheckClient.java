@@ -149,7 +149,7 @@ public final class CheckClient {
         List<Line> lines = new ArrayList<>();
         Village v = result.village();
 
-        // Individual: only what is wrong with this one villager.
+        // Individual: everything wrong with this one villager, all at once.
         lines.add(new Line(v.known() && v.rank() > 0
                 ? "VILLAGER  " + v.rank() + " of " + v.total() : "VILLAGER", WHITE));
         boolean individualOk = true;
@@ -163,29 +163,31 @@ public final class CheckClient {
             lines.add(new Line("OK", GREEN));
         }
 
-        // Group: the villagers around it and the spot a golem would appear.
+        // Group: both ways a golem can come about, scare first (the usual farm), then the shared blockers.
         lines.add(new Line("GROUP", WHITE));
-        lines.add(new Line(result.nearby() + " in range, " + result.ready() + " ready", GRAY));
-        lines.add(new Line(result.panicking()
-                ? "Panicking: " + GolemDoctor.PANIC_VILLAGERS_NEEDED + " must be ready"
-                : "Gossip: " + GolemDoctor.VILLAGERS_NEEDED + " ready (panic: "
-                        + GolemDoctor.PANIC_VILLAGERS_NEEDED + ")", GRAY));
-        boolean groupOk = true;
+        lines.add(new Line(result.nearby() + " in range, " + result.ready() + " ready"
+                + (result.panicking() ? ", scared now" : ""), GRAY));
+        lines.add(new Line(result.methodText(true), result.ready() >= CheckResult.SCARE_NEEDED ? GREEN : RED));
+        lines.add(new Line(result.methodText(false), result.ready() >= CheckResult.GOSSIP_NEEDED ? GREEN : RED));
+        boolean spaceOk = true;
         for (Entry e : result.reasons()) {
             if (e.reason().isGroup()) {
                 lines.add(new Line(e.text(), RED));
-                groupOk = false;
+                spaceOk = false;
             }
         }
-        if (groupOk) {
-            lines.add(new Line("OK", GREEN));
+        if (spaceOk) {
+            lines.add(new Line("Spawn Space OK", GREEN));
         }
         if (v.known()) {
             lines.add(new Line("Village " + v.chunksX() + "x" + v.chunksZ() + " chunks", GRAY));
             lines.add(new Line("x " + v.minX() + " to " + v.maxX() + "   z " + v.minZ() + " to " + v.maxZ(), GRAY));
         }
-        if (result.reasons().isEmpty()) {
-            lines.add(new Line("SHOULD SPAWN", GREEN));
+        if (result.scareOk()) {
+            lines.add(new Line("Should Spawn (scare)", GREEN));
+        }
+        if (result.gossipOk()) {
+            lines.add(new Line("Should Spawn (gossip)", GREEN));
         }
         return lines;
     }

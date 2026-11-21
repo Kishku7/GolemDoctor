@@ -37,7 +37,6 @@ public record CheckReplyPayload(CheckResult result) implements CustomPacketPaylo
         }
         buf.writeVarInt(r.nearby());
         buf.writeVarInt(r.ready());
-        buf.writeVarInt(r.needed());
         buf.writeBoolean(r.panicking());
         Village v = r.village();
         buf.writeBoolean(v.known());
@@ -66,14 +65,13 @@ public record CheckReplyPayload(CheckResult result) implements CustomPacketPaylo
         }
         int nearby = buf.readVarInt();
         int ready = buf.readVarInt();
-        int needed = buf.readVarInt();
         boolean panicking = buf.readBoolean();
         Village village = Village.unknown();
         if (buf.readBoolean()) {
             village = new Village(true, buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
                     buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt());
         }
-        return new CheckReplyPayload(new CheckResult(entityId, reasons, village, nearby, ready, needed, panicking));
+        return new CheckReplyPayload(new CheckResult(entityId, reasons, village, nearby, ready, panicking));
     }
 
     @Override

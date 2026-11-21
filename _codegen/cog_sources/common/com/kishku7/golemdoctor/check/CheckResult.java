@@ -11,11 +11,40 @@ import java.util.List;
  * @param village  the village the villager belongs to
  * @param nearby   villagers inside the 10-block golem agreement box around this villager (itself included)
  * @param ready    how many of those would agree to a golem right now
- * @param needed   how many must agree: 3 when this villager is panicking, otherwise 5 (gossip)
  * @param panicking true when this villager is in the panic activity (hostile mob in sight or hurt)
  */
 public record CheckResult(int entityId, List<Entry> reasons, Village village, int nearby, int ready,
-                          int needed, boolean panicking) {
+                          boolean panicking) {
+
+    /** Villagers that must be ready when the golem comes from scaring (zombie in sight, or hurt). */
+    public static final int SCARE_NEEDED = 3;
+    /** Villagers that must be ready when the golem comes from gossip (villagers meeting). */
+    public static final int GOSSIP_NEEDED = 5;
+
+    private boolean has(Reason.Scope scope) {
+        for (Entry e : reasons) {
+            if (e.reason().scope() == scope) return true;
+        }
+        return false;
+    }
+
+    /** True when the scare method would produce a golem right now (nothing else blocking it). */
+    public boolean scareOk() {
+        return ready >= SCARE_NEEDED && !has(Reason.Scope.VILLAGER) && !has(Reason.Scope.SHARED);
+    }
+
+    /** True when the gossip method would produce a golem right now. */
+    public boolean gossipOk() {
+        return ready >= GOSSIP_NEEDED && !has(Reason.Scope.VILLAGER) && !has(Reason.Scope.SHARED)
+                && !has(Reason.Scope.GOSSIP);
+    }
+
+    /** Ready-count line for one method, for example "Scare: 1 ready, needs 3". */
+    public String methodText(boolean scare) {
+        int need = scare ? SCARE_NEEDED : GOSSIP_NEEDED;
+        return (scare ? "Scare: " : "Gossip: ") + ready + " ready, needs " + need;
+    }
+
 
     /** One blocker; {@code param} is only meaningful for {@link Reason#TOO_FEW_READY} (the number needed). */
     public record Entry(Reason reason, int param) {

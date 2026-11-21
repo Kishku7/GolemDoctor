@@ -47,14 +47,19 @@ public final class CheckCommand {
         }
         ctx.getSource().sendSuccess(() -> Component.literal(head.toString()), false);
         ctx.getSource().sendSuccess(() -> Component.literal("GROUP: " + result.nearby()
-                + " in range, " + result.ready() + " ready, need " + result.needed()
-                + (result.panicking() ? " (panic)" : " (gossip)")), false);
-        if (result.reasons().isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.literal("SHOULD SPAWN"), false);
-        } else {
-            for (Entry e : result.reasons()) {
-                ctx.getSource().sendSuccess(() -> Component.literal((e.reason().isGroup() ? "BLOCKED (group): " : "BLOCKED (villager): ") + e.text()), false);
-            }
+                + " in range, " + result.ready() + " ready" + (result.panicking() ? " (scared now)" : "")), false);
+        ctx.getSource().sendSuccess(() -> Component.literal(result.methodText(true)
+                + (result.ready() >= CheckResult.SCARE_NEEDED ? " (ok)" : " (short)")), false);
+        ctx.getSource().sendSuccess(() -> Component.literal(result.methodText(false)
+                + (result.ready() >= CheckResult.GOSSIP_NEEDED ? " (ok)" : " (short)")), false);
+        for (Entry e : result.reasons()) {
+            ctx.getSource().sendSuccess(() -> Component.literal((e.reason().isGroup() ? "BLOCKED (group): " : "BLOCKED (villager): ") + e.text()), false);
+        }
+        if (result.scareOk()) {
+            ctx.getSource().sendSuccess(() -> Component.literal("SHOULD SPAWN (scare)"), false);
+        }
+        if (result.gossipOk()) {
+            ctx.getSource().sendSuccess(() -> Component.literal("SHOULD SPAWN (gossip)"), false);
         }
         return result.reasons().size();
     }

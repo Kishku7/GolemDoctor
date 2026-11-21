@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.SpawnUtil;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -45,15 +46,18 @@ public final class GolemCheck {
         boolean sleptRecently = lastSlept.isPresent()
                 && now - lastSlept.get() < GolemDoctor.SLEEP_WINDOW_TICKS;
         if (!sleptRecently) {
+            // No bed is only a blocker while the villager has not slept: it explains why it cannot.
             if (!brain.hasMemoryValue(MemoryModuleType.HOME)) {
                 reasons.add(new Entry(Reason.NO_BED, 0));
-            } else {
-                reasons.add(new Entry(Reason.NOT_SLEPT, 0));
             }
+            int minutes = lastSlept.isPresent() ? (int) ((now - lastSlept.get()) / 1200L) : -1;
+            reasons.add(new Entry(Reason.NOT_SLEPT, minutes));
         }
 
         if (brain.hasMemoryValue(MemoryModuleType.GOLEM_DETECTED_RECENTLY)) {
-            reasons.add(new Entry(Reason.GOLEM_NEARBY, 0));
+            long left = brain.getTimeUntilExpiry(MemoryModuleType.GOLEM_DETECTED_RECENTLY);
+            long ago = Math.max(0L, GolemDoctor.GOLEM_MEMORY_TICKS - left);
+            reasons.add(new Entry(Reason.GOLEM_NEARBY, (int) (ago / 20L)));
         }
 
         AABB box = villager.getBoundingBox().inflate(AGREE_RANGE);
@@ -65,16 +69,14 @@ public final class GolemCheck {
                 ready++;
             }
         }
-        // Vanilla: gossip (two villagers meeting) asks for 5, the panic trigger (every 100 ticks while a
-        // villager is scared by a hostile mob or hurt) asks for only 3.
+        // The ready count is not a reason here: the client compares it with 3 (scare) and 5 (gossip) itself.
         boolean panicking = brain.isActive(Activity.PANIC);
-        int needed = panicking ? GolemDoctor.PANIC_VILLAGERS_NEEDED : GolemDoctor.VILLAGERS_NEEDED;
-        if (ready < needed) {
-            reasons.add(new Entry(Reason.TOO_FEW_READY, needed));
-        }
 
-        if (!panicking && nearby.size() >= 2 && !canGather(villager, nearby)) {
-            reasons.add(new Entry(Reason.CANNOT_MEET, 0));
+        if (nearby.size() >= 2 && !canGather(villager, nearby)) {
+            reasons.add(new Entry(Reason.CANT_GOSSIP, 0));
+        }
+        if (!canReachBell(level, villager)) {
+            reasons.add(new Entry(Reason.CANT_REACH_BELL, 0));
         }
 
         if (!hasSpawnSpace(level, villager)) {
@@ -82,7 +84,25 @@ public final class GolemCheck {
         }
 
         return new CheckResult(villager.getId(), reasons, VillageScan.scan(level, villager),
-                nearby.size(), ready, needed, panicking);
+                nearby.size(), ready, panicking);
+    }
+
+    /**
+     * False only when the villager has a bell, the bell is close enough to test, and there is no path to
+     * it. Far or unloaded bells are not judged, so the answer never guesses.
+     */
+    private static boolean canReachBell(ServerLevel level, Villager villager) {
+        Optional<GlobalPos> bell = villager.getBrain().getMemory(MemoryModuleType.MEETING_POINT);
+        if (bell.isEmpty() || !bell.get().dimension().equals(level.dimension())) {
+            return true;
+        }
+        BlockPos pos = bell.get().pos();
+        if (!level.isLoaded(pos)
+                || villager.blockPosition().distSqr(pos) > GolemDoctor.BELL_TEST_RANGE * GolemDoctor.BELL_TEST_RANGE) {
+            return true;
+        }
+        Path path = villager.getNavigation().createPath(pos, 2);
+        return path != null && path.canReach();
     }
 
     /**

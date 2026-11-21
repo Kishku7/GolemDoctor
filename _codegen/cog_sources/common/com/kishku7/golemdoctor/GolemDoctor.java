@@ -9,11 +9,15 @@ public final class GolemDoctor {
     /** Villagers (that qualify) a villager needs within range before vanilla will spawn a golem. */
     public static final int VILLAGERS_NEEDED = 5;
 
-    /** Villagers that must agree when the trigger is panic (a hostile mob in sight or being hurt): vanilla passes 3. */
-    public static final int PANIC_VILLAGERS_NEEDED = 3;
 
     /** Ticks since a villager last slept within which it still counts for a golem (vanilla: 24000). */
     public static final long SLEEP_WINDOW_TICKS = 24000L;
+
+    /** Ticks vanilla keeps the "saw a golem recently" memory (the villager will not agree to a golem meanwhile). */
+    public static final long GOLEM_MEMORY_TICKS = 599L;
+
+    /** The bell path test only runs when the bell is this close (blocks): a villager's own path search stops near 16. */
+    public static final double BELL_TEST_RANGE = 14.0;
 
     /** Client re-asks the server this often (ticks) while the crosshair stays on one villager. */
     public static final int REFRESH_TICKS = 10;

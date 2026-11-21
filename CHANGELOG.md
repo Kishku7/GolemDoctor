@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.0] - 2026-11-21
+- The popup shows both ways a golem comes about at once, scare first: "Scare: n ready, needs 3" and
+  "Gossip: n ready, needs 5", each green when met and red when short. Scare no longer waits for the villager
+  to be panicking, so the usual zombie-scare farm is judged on its own number.
+- Every problem is listed at once, in plain wording: Has no bed, Not Slept in N minutes, Saw Golem N seconds ago,
+  Can't Gossip, Can't Reach Bell, No Spawn Space for Golem. Can't Gossip and Can't Reach Bell only affect gossip.
+- "Should Spawn (scare)" and "Should Spawn (gossip)" show when nothing blocks that method.
+- Has no bed is only listed while the villager has not slept.
+- `/golemcheck` prints the same scare and gossip lines.
+
 ## [1.1.0] - 2026-11-20
 - The popup now has two sections: VILLAGER (what is wrong with this one villager: NO BED, NOT SLEPT, GOLEM NEARBY,
   CANNOT MEET) and GROUP (villagers in range and how many are ready, NEED n READY, NO SPAWN SPACE, village size and
