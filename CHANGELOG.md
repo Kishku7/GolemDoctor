@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.1] - 2026-11-21
+- The jar manifest now carries the mod version (Implementation-Version).
+- The Fabric API floor in the manifest is the version the mod was tested with (0.166.2), not an untested lower one.
+
 ## [1.2.0] - 2026-11-21
 - The popup shows both ways a golem comes about at once, scare first: "Scare: n ready, needs 3" and
   "Gossip: n ready, needs 5", each green when met and red when short. Scare no longer waits for the villager

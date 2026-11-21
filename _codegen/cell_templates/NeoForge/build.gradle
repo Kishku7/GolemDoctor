@@ -42,3 +42,14 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 25
     options.compilerArgs << '-Xlint:all'   // D11: zero-warning bar on every cell.
 }
+
+// D23: the jar manifest carries the real version, so the published file can be checked without trusting its name.
+jar {
+    manifest {
+        attributes([
+            'Implementation-Title'  : 'golemdoctor',
+            'Implementation-Version': project.version,
+            'Implementation-Vendor' : 'Kishku7'
+        ])
+    }
+}

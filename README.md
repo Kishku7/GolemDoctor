@@ -17,6 +17,13 @@ pwsh scripts/build-fabric.ps1
 The jar lands in `dist/` as `golemdoctor-<version>+26.3-fabric.jar`. The build logs to
 `Fabric/_build.log`; it is only green when that log holds no `.java ... warning` line.
 
+## Toolchain matrix
+| Loader | Minecraft | JDK | Build tool |
+|---|---|---|---|
+| Fabric | 26.3 | 25 | fabric-loom, mojmap names, Gradle 9.4 |
+| NeoForge | 26.3 | 25 | planned (ModDevGradle) |
+| Forge | 1.21.11 | 21 | planned (ForgeGradle) |
+
 ## Status of the platforms
 | Loader | Line | State |
 |---|---|---|
@@ -38,6 +45,12 @@ class (`EntityType` before 26.2, `EntityTypes` from 26.2) and the GUI draw class
 - `_codegen/cell_templates` - per-loader build wiring.
 - `scripts/` - `cog-gen.ps1` builds a whole cell from `_codegen`; `build-*.ps1` run it and Gradle.
 - `Fabric/`, `NeoForge/`, `Forge/`, `Plugin/` - generated on every build, not tracked.
+
+## How the code generation works
+Every Java file lives once under `_codegen/cog_sources`. `scripts/cog-gen.ps1` wipes a cell folder and rebuilds it
+from that one source: the build files from `_codegen/cell_templates`, the generated entrypoints from
+`_codegen/compat.py`, and the shared Minecraft code with Cog blocks resolved for the cell's Minecraft version.
+Nothing inside `Fabric/`, `NeoForge/`, `Forge/` or `Plugin/` is edited by hand.
 
 ## How it works
 The client sends the entity id of the villager under the crosshair. The server checks the same conditions vanilla

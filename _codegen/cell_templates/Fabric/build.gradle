@@ -38,3 +38,14 @@ java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
 }
+
+// D23: the jar manifest carries the real version, so the published file can be checked without trusting its name.
+jar {
+    manifest {
+        attributes([
+            'Implementation-Title'  : 'golemdoctor',
+            'Implementation-Version': project.version,
+            'Implementation-Vendor' : 'Kishku7'
+        ])
+    }
+}
