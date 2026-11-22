@@ -39,8 +39,8 @@ class (`EntityType` before 26.2, `EntityTypes` from 26.2) and the GUI draw class
 
 ## Repository layout
 - `_codegen/cog_sources/common` - Minecraft-free Java (constants, reasons, result records).
-- `_codegen/cog_sources/shared` - Minecraft code: the check logic, the packets, the client popup.
-- `_codegen/cog_sources/fabric` - the Fabric packet wiring.
+- `_codegen/cog_sources/shared` - Minecraft code: the check logic, the packets, the client popup, the `/golemlog` counter.
+- `_codegen/cog_sources/fabric` - the Fabric packet wiring and the one mixin.
 - `_codegen/compat.py` - per-loader entrypoints and the version axis.
 - `_codegen/cell_templates` - per-loader build wiring.
 - `scripts/` - `cog-gen.ps1` builds a whole cell from `_codegen`; `build-*.ps1` run it and Gradle.
@@ -59,6 +59,14 @@ for the scare method or five for gossip, villagers that can walk to each other, 
 plus the villager's number in its village. The client draws that as a popup while the crosshair stays on the
 villager. The server only ever replies to a request, so a client without the mod is never sent anything, and a
 client with the mod sends nothing to a server that does not have it.
+
+## Golem spawn log
+`/golemlog` counts iron golems as the server adds them. One mixin on `ServerLevel.addFreshEntity` records each
+fresh golem (never one loaded back from a chunk, never one a player built from pumpkins). History is kept for an hour in
+memory. `/golemlog now` prints rolling 15 and 60 minute figures, the busiest chunks and the last spawn; `/golemlog start [chunks]`
+sends a report once a minute to whoever asked (a player or the console), with a near-you count within that many chunks of
+the player (their own chunk is 0, default 8); `/golemlog stop` and `/golemlog radius <chunks>` do what they say.
+Iron figures are estimates at 4 ingots per golem.
 
 ## License and credit
 Copyright (c) 2026 Kishku7. Released under the GNU General Public License v3.0 only (see `LICENSE`).

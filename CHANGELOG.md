@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.0] - 2026-11-21
+- New `/golemlog` command: counts iron golems that spawn on the server and reports once a minute, to whoever
+  turned it on (a player in chat, or the server console).
+- Each report gives the server count for the minute, the running average, an estimated iron per hour, and, when a
+  player asked, how many of those spawned within a radius of that player (default 8 chunks, the player's own chunk
+  being chunk 0).
+- `/golemlog now` prints rolling 15 minute and 60 minute totals, the busiest chunks with coordinates and the most
+  recent spawn. `/golemlog radius <chunks>` and `/golemlog stop` do what they say.
+- Needs the mod on the server. Uses one small mixin (the server adding a new entity).
+
 ## [1.3.0] - 2026-11-21
 - Fabric builds for Minecraft 1.21.11, 26.1 (26.1 to 26.1.2), 26.2, 26.3 and 26.4 (built against 26.4-snapshot-10).
 - Each build declares the Minecraft range and the Fabric API floor it was built and tested with.

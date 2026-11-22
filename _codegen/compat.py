@@ -43,6 +43,7 @@ def vt(ver):
 #   EntityType (class holding IRON_GOLEM)  1.21.11, 26.1.x  -> EntityType ;  26.2+ -> EntityTypes
 #   Fabric API payload registry            1.21.11 -> playC2S/playS2C ; 26.1+ -> serverboundPlay/clientboundPlay
 #   Fabric API HudElement callback         up to 26.3 -> (graphics, tickDelta) ; 26.4+ -> (graphics)
+#   Command integer argument               26.4 -> net.minecraft.commands.arguments.IntegerArgument ; earlier -> brigadier IntegerArgumentType
 #   GUI draw class                         1.21.11 -> GuiGraphics (drawString, renderOutline)
 #                                          26.1+   -> GuiGraphicsExtractor (text, outline)
 # ---------------------------------------------------------------------------------------------
@@ -62,6 +63,20 @@ def entity_types_import(cog, ver):
 
 def entity_types_create(cog, ver):
     cog.outl("IronGolem golem = {0}.IRON_GOLEM.create(level, null, search.immutable(),".format(entity_types(ver)))
+
+
+def int_arg(cog, ver):
+    # Command integer argument: 26.4 snapshots only accept vanilla's own IntegerArgument (brigadier's
+    # IntegerArgumentType is rejected when the command tree is sent: "Invalid argument type").
+    cls = ("net.minecraft.commands.arguments.IntegerArgument" if vt(ver) >= (26, 4)
+           else "com.mojang.brigadier.arguments.IntegerArgumentType")
+    cog.outl("private static com.mojang.brigadier.arguments.ArgumentType<Integer> chunksArg() {")
+    cog.outl("    return {0}.integer(0, GolemSpawnLog.MAX_RADIUS);".format(cls))
+    cog.outl("}")
+    cog.outl("")
+    cog.outl("private static int chunksValue(CommandContext<CommandSourceStack> ctx) {")
+    cog.outl("    return {0}.getInteger(ctx, \"chunks\");".format(cls))
+    cog.outl("}")
 
 
 def gfx_import(cog, ver):
@@ -98,10 +113,15 @@ def hud_lambda(ver):
 
 _FABRIC_MAIN = '''package com.kishku7.golemdoctor;
 
+import com.kishku7.golemdoctor.log.GolemLogCommand;
+import com.kishku7.golemdoctor.log.GolemSpawnLog;
 import com.kishku7.golemdoctor.net.CheckCommand;
 import com.kishku7.golemdoctor.net.CheckerNet;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 /** Golem Doctor - Fabric common entrypoint (runs on dedicated servers and clients). */
 public class GolemDoctorFabric implements ModInitializer {
@@ -110,8 +130,15 @@ public class GolemDoctorFabric implements ModInitializer {
     public void onInitialize() {
         CheckerNet.registerTypes();
         CheckerNet.registerServer();
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                CheckCommand.register(dispatcher));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            CheckCommand.register(dispatcher);
+            GolemLogCommand.register(dispatcher);
+        });
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> GolemSpawnLog.serverStarted());
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> GolemSpawnLog.serverStopped());
+        ServerTickEvents.END_SERVER_TICK.register(GolemSpawnLog::tick);
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+                GolemSpawnLog.forget(handler.getPlayer().getUUID()));
     }
 }
 '''

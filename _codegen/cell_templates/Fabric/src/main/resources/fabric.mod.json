@@ -13,6 +13,7 @@
   "license": "GPL-3.0-only",
   "icon": "assets/golemdoctor/icon.png",
   "environment": "*",
+  "mixins": ["golemdoctor.mixins.json"],
   "entrypoints": {
     "main": ["com.kishku7.golemdoctor.GolemDoctorFabric"],
     "client": ["com.kishku7.golemdoctor.client.GolemDoctorFabricClient"]
