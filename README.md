@@ -66,6 +66,9 @@ fresh golem (never one loaded back from a chunk, never one a player built from p
 memory. `/golemlog now` prints rolling 15 and 60 minute figures, the busiest chunks and the last spawn; `/golemlog start [chunks]`
 sends a report once a minute to whoever asked (a player or the console), with a near-you count within that many chunks of
 the player (their own chunk is 0, default 8); `/golemlog stop` and `/golemlog radius <chunks>` do what they say.
+`/golemlog towers [minutes]` groups the spawns of the last 1 to 60 minutes (default 15) into towers, spawns within 24 blocks
+of each other being one tower, and prints one row per tower: count, rate, gap between spawns (average, shortest, longest),
+how long ago the last spawn was and the distance from you. A tower whose last spawn keeps getting older has stalled.
 Iron figures are estimates at 4 ingots per golem.
 
 ## License and credit

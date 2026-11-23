@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
  * <pre>
  * /golemlog               same as now
  * /golemlog now           rolling 15 and 60 minute figures, busiest chunks, last spawn
+ * /golemlog towers [min]  one row per tower: count, rate, gap between spawns (minutes of history, default 15)
  * /golemlog start [n]     report once a minute to me, near-you radius n chunks (default 8)
  * /golemlog stop          stop my reports
  * /golemlog radius n      change my near-you radius (chunks; my own chunk is 0)
@@ -30,6 +31,10 @@ public final class GolemLogCommand {
                         .executes(ctx -> start(ctx, -1))
                         .then(Commands.argument("chunks", chunksArg())
                                 .executes(ctx -> start(ctx, chunksValue(ctx)))))
+                .then(Commands.literal("towers")
+                        .executes(ctx -> towers(ctx, 15))
+                        .then(Commands.argument("chunks", chunksArg())
+                                .executes(ctx -> towers(ctx, chunksValue(ctx)))))
                 .then(Commands.literal("stop").executes(GolemLogCommand::stop))
                 .then(Commands.literal("radius")
                         .then(Commands.argument("chunks", chunksArg())
@@ -47,6 +52,15 @@ public final class GolemLogCommand {
         ServerPlayer player = ctx.getSource().getPlayer();
         int radius = GolemSpawnLog.radiusFor(GolemSpawnLog.key(player));
         for (String line : GolemSpawnLog.summary(player, radius)) {
+            ctx.getSource().sendSuccess(() -> Component.literal(line), false);
+        }
+        return 1;
+    }
+
+    /** Per-tower rows. The number is minutes of history (1 to 60, default 15). */
+    private static int towers(CommandContext<CommandSourceStack> ctx, int minutes) {
+        int mins = Math.max(1, Math.min(60, minutes));
+        for (String line : GolemSpawnLog.towers(ctx.getSource().getPlayer(), mins)) {
             ctx.getSource().sendSuccess(() -> Component.literal(line), false);
         }
         return 1;

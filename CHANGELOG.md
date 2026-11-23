@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.0] - 2026-11-22
+- New `/golemlog towers [minutes]`: one row per golem tower, so a farm that has stopped producing stands out.
+  Spawns within 24 blocks of each other (same dimension) count as one tower. Each row gives the golem count, the
+  rate per minute, the average, shortest and longest gap between spawns, how long ago the last spawn was and, for a
+  player, how far away the tower is. Minutes of history default to 15 (1 to 60), and rows are sorted busiest first.
+- A tower with a very long longest gap, or a last spawn that keeps getting older, usually has a golem that never died
+  and is keeping its villagers from spawning another.
+- Built and tested for Fabric 26.3 only so far.
+
 ## [1.4.0] - 2026-11-21
 - New `/golemlog` command: counts iron golems that spawn on the server and reports once a minute, to whoever
   turned it on (a player in chat, or the server console).

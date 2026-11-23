@@ -240,6 +240,109 @@ public final class GolemSpawnLog {
         out.add(s);
     }
 
+    // ---- per-tower breakdown ----
+
+    private static final double TOWER_JOIN_BLOCKS = 24.0;
+
+    private static final class Cluster {
+        final ServerLevel level;
+        double sx;
+        double sz;
+        final List<Long> times = new ArrayList<>();
+
+        Cluster(ServerLevel level) {
+            this.level = level;
+        }
+
+        void add(Spawn s) {
+            sx += s.x();
+            sz += s.z();
+            times.add(s.timeMs());
+        }
+
+        double cx() {
+            return sx / times.size();
+        }
+
+        double cz() {
+            return sz / times.size();
+        }
+    }
+
+    /**
+     * Lines for /golemlog towers: spawns in the last mins minutes grouped by where they happen (within 24
+     * blocks of a group's centre is the same tower), one row per tower with count, rate and the gap between
+     * its spawns. player may be null (console).
+     */
+    public static List<String> towers(ServerPlayer player, int mins) {
+        long now = System.currentTimeMillis();
+        trim(now);
+        long from = now - mins * 60_000L;
+        double upMin = Math.max(1.0, (now - trackingSince) / 60_000.0);
+        double span = Math.min(mins, upMin);
+        List<Cluster> clusters = new ArrayList<>();
+        for (Spawn s : HISTORY) {
+            if (s.timeMs() < from) {
+                continue;
+            }
+            Cluster best = null;
+            double bestD = TOWER_JOIN_BLOCKS;
+            for (Cluster c : clusters) {
+                if (c.level != s.level()) {
+                    continue;
+                }
+                double dx = c.cx() - s.x();
+                double dz = c.cz() - s.z();
+                double d = Math.sqrt(dx * dx + dz * dz);
+                if (d <= bestD) {
+                    best = c;
+                    bestD = d;
+                }
+            }
+            if (best == null) {
+                best = new Cluster(s.level());
+                clusters.add(best);
+            }
+            best.add(s);
+        }
+        List<String> out = new ArrayList<>();
+        out.add("[GolemLog] towers, last " + mins + " min (spawns within " + Math.round(TOWER_JOIN_BLOCKS)
+                + " blocks of each other count as one tower; span " + fmtMin(span) + ")");
+        if (clusters.isEmpty()) {
+            out.add("[GolemLog] no golem has spawned in that time");
+            return out;
+        }
+        clusters.sort((a, b) -> Integer.compare(b.times.size(), a.times.size()));
+        int rank = 1;
+        for (Cluster c : clusters) {
+            int n = c.times.size();
+            StringBuilder sb = new StringBuilder("[GolemLog] #" + rank++ + " x " + Math.round(c.cx()) + " z "
+                    + Math.round(c.cz()) + ": " + n + " golems, " + perMin(n, span) + "/min");
+            if (n >= 2) {
+                long total = c.times.get(n - 1) - c.times.get(0);
+                long min = Long.MAX_VALUE;
+                long max = 0;
+                for (int i = 1; i < n; i++) {
+                    long g = c.times.get(i) - c.times.get(i - 1);
+                    min = Math.min(min, g);
+                    max = Math.max(max, g);
+                }
+                sb.append(String.format(Locale.ROOT, ", gap avg %.0f s (min %d, max %d)",
+                        total / 1000.0 / (n - 1), min / 1000, max / 1000));
+            }
+            sb.append(", last ").append(Math.max(0, (now - c.times.get(n - 1)) / 1000)).append(" s ago");
+            if (player != null && c.level == player.level()) {
+                double dx = c.cx() - player.getX();
+                double dz = c.cz() - player.getZ();
+                sb.append(", ").append(Math.round(Math.sqrt(dx * dx + dz * dz))).append(" blocks from you");
+            }
+            out.add(sb.toString());
+        }
+        out.add("[GolemLog] " + clusters.size() + " towers, " + clusters.stream().mapToInt(c -> c.times.size()).sum()
+                + " golems in total");
+        return out;
+    }
+
     // ---- counting ----
 
     private static boolean within(Spawn s, Object level, int pcx, int pcz, int radius) {
