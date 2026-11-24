@@ -1,80 +1,42 @@
-# Golem Doctor - Build Guide (minecraft-26.3 branch)
+# Golem Doctor
 
-Landing page: the `main` branch README. Report issues / support: https://github.com/Kishku7/mod_support
+**Why no golem?** Your villagers are not making iron golems and you do not know why. Point at one and the answer appears in the middle of your screen, in plain words, with every problem listed at once. One jar works on the client and the server, and a server that has it does not need its players to have it.
 
-Why no golem? Point at a villager and see, in red, why it is not producing iron golems. This branch holds the
-one source for the mod; one jar serves both the client and the server.
+Ships as a **Fabric** mod.
 
-## What you need installed
-- JDK 25 (Eclipse Temurin; Gradle finds it by major version, no path is pinned)
-- Python 3 and Cog: `pip install cogapp`
-- PowerShell 7
+## Why Golem Doctor
 
-## How to build
-```
-pwsh scripts/build-fabric.ps1
-```
-The jar lands in `dist/` as `golemdoctor-<version>+26.3-fabric.jar`. The build logs to
-`Fabric/_build.log`; it is only green when that log holds no `.java ... warning` line.
+The game decides whether a villager makes an iron golem from a handful of hidden rules: a recent sleep, no golem seen lately, enough villagers ready nearby, a way for them to meet, and room to place the golem. When a farm does nothing, you cannot see which rule is failing. Golem Doctor shows you, and it checks both ways a golem can be made: the zombie-scare method most farms use, and the older gossip method.
 
-## Toolchain matrix
-| Loader | Minecraft | JDK | Build tool |
-|---|---|---|---|
-| Fabric | 26.3 | 25 | fabric-loom, mojmap names, Gradle 9.4 |
-| NeoForge | 26.3 | 25 | planned (ModDevGradle) |
-| Forge | 1.21.11 | 21 | planned (ForgeGradle) |
+## Using Golem Doctor
 
-## Status of the platforms
-| Loader | Line | State |
-|---|---|---|
-| Fabric | 26.3 | built and tested |
-| NeoForge | 26.3 | planned (cell template kept) |
-| Forge | 1.21.11 | planned (cell template kept) |
-| Paper plugin | - | planned (cell template kept) |
+Point your crosshair at a villager. A popup appears with two parts.
 
-Older and newer Minecraft lines (1.21.11 to 26.4) are planned. Where they differ, the difference is isolated in
-`_codegen/compat.py` with Cog markers in `shared`, never a second copy of a file. Already seamed: the entity type
-class (`EntityType` before 26.2, `EntityTypes` from 26.2) and the GUI draw class (`GuiGraphics` on 1.21.11,
-`GuiGraphicsExtractor` from 26.1).
+**VILLAGER** - what is wrong with this one villager:
+- **Has no bed** - it has nowhere to sleep.
+- **Not Slept in 16 minutes** - it has not slept recently enough (a golem needs a sleep within the last day).
+- **Saw Golem 12 seconds ago** - it saw an iron golem very recently and will not agree to another yet.
 
-## Repository layout
-- `_codegen/cog_sources/common` - Minecraft-free Java (constants, reasons, result records).
-- `_codegen/cog_sources/shared` - Minecraft code: the check logic, the packets, the client popup, the `/golemlog` counter.
-- `_codegen/cog_sources/fabric` - the Fabric packet wiring and the one mixin.
-- `_codegen/compat.py` - per-loader entrypoints and the version axis.
-- `_codegen/cell_templates` - per-loader build wiring.
-- `scripts/` - `cog-gen.ps1` builds a whole cell from `_codegen`; `build-*.ps1` run it and Gradle.
-- `Fabric/`, `NeoForge/`, `Forge/`, `Plugin/` - generated on every build, not tracked.
+**GROUP** - the villagers around it and the spot a golem would appear:
+- **Scare: 2 ready, needs 3** - the zombie-scare method. Green when enough villagers are ready.
+- **Gossip: 2 ready, needs 5** - the gossip method. Green when met.
+- **Can't Gossip** - walls, pens or water keep the villagers from walking up to each other.
+- **Can't Reach Bell** - the villager cannot walk to its bell.
+- **No Spawn Space for Golem** - there is no room around the villager to place a golem.
+- **Should Spawn (scare)** or **Should Spawn (gossip)**, in green - nothing is blocking that method.
 
-## How the code generation works
-Every Java file lives once under `_codegen/cog_sources`. `scripts/cog-gen.ps1` wipes a cell folder and rebuilds it
-from that one source: the build files from `_codegen/cell_templates`, the generated entrypoints from
-`_codegen/compat.py`, and the shared Minecraft code with Cog blocks resolved for the cell's Minecraft version.
-Nothing inside `Fabric/`, `NeoForge/`, `Forge/` or `Plugin/` is edited by hand.
+Under that it shows which villager this is in its village ("Villager 3 of 5"), how big the village is in chunks, and its coordinates. The popup stays for five seconds after you look away, so you can still read it if the villager runs off. `/golemcheck <villager>` prints the same answer in chat.
 
-## How it works
-The client sends the entity id of the villager under the crosshair. The server checks the same conditions vanilla
-checks before it spawns a golem (a recent sleep, no golem seen recently, three villagers that qualify within ten blocks
-for the scare method or five for gossip, villagers that can walk to each other, room to place the golem) and sends the list of what is blocking it,
-plus the villager's number in its village. The client draws that as a popup while the crosshair stays on the
-villager. The server only ever replies to a request, so a client without the mod is never sent anything, and a
-client with the mod sends nothing to a server that does not have it.
+It works in singleplayer, on LAN and on dedicated servers. The server works out the answer from the same rules the game uses and the client only shows it. A player who has the mod loses nothing on a server that does not.
 
-## Golem spawn log
-`/golemlog` counts iron golems as the server adds them. One mixin on `ServerLevel.addFreshEntity` records each
-fresh golem (never one loaded back from a chunk, never one a player built from pumpkins). History is kept for an hour in
-memory. `/golemlog now` prints rolling 15 and 60 minute figures, the busiest chunks and the last spawn; `/golemlog start [chunks]`
-sends a report once a minute to whoever asked (a player or the console), with a near-you count within that many chunks of
-the player (their own chunk is 0, default 8); `/golemlog stop` and `/golemlog radius <chunks>` do what they say.
-`/golemlog towers [minutes]` groups the spawns of the last 1 to 60 minutes (default 15) into towers, spawns within 24 blocks
-of each other being one tower, and prints one row per tower: count, rate, gap between spawns (average, shortest, longest),
-how long ago the last spawn was and the distance from you. A tower whose last spawn keeps getting older has stalled.
-Iron figures are estimates at 4 ingots per golem.
+## Source
 
-## License and credit
-Copyright (c) 2026 Kishku7. Released under the GNU General Public License v3.0 only (see `LICENSE`).
+Source code: [Kishku7/GolemDoctor](https://github.com/Kishku7/GolemDoctor) (build guide: `BUILDING.md`).
 
-Inspired by Iron Golem Spawn Checker by MossShade (https://modrinth.com/mod/iron-golem-spawn-checker), a client-side
-overlay that shows where iron golems can spawn. This mod is a separate work, written from the vanilla game code
-for a different job (telling you why a villager is not producing golems); none of that mod's code is used here.
-Thank you to its author for the idea.
+## Support
+
+Report bugs or request features at https://github.com/Kishku7/mod_support/issues
+
+Inspired by the Iron Golem Spawn Checker mod by MossShade, which shows where golems can spawn. This is a separate work and uses none of its code. Thank you to its author for the idea.
+
+By Kishku7. Licensed GPL-3.0-only.
