@@ -7,7 +7,8 @@
   player, how far away the tower is. Minutes of history default to 15 (1 to 60), and rows are sorted busiest first.
 - A tower with a very long longest gap, or a last spawn that keeps getting older, usually has a golem that never died
   and is keeping its villagers from spawning another.
-- Built and tested for Fabric 26.3 only so far.
+- Fabric builds for Minecraft 1.21.11, 26.1 (26.1 to 26.1.2), 26.2, 26.3 and 26.4-pre-1 (the 26.4 build accepts only that one pre-release).
+- Each build passed the server behaviour checks and a singleplayer popup check on its own Minecraft version.
 
 ## [1.4.0] - 2026-11-21
 - New `/golemlog` command: counts iron golems that spawn on the server and reports once a minute, to whoever
